@@ -107,3 +107,138 @@ Restart fully stopped (deallocated) VMs | 1. If you use older VM series or sizes
 > https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/features-windows
 
 ???
+
+## Azure Storage
+
+### Introduction
+> - https://docs.microsoft.com/en-us/azure/storage/common/storage-introduction
+> - https://docs.microsoft.com/en-us/azure/storage/common/storage-decide-blobs-files-disks
+
+- Features
+  - Durable and highly available
+  - Secure
+  - Scalable
+  - Managed
+  - Accessible
+
+- Storage services
+
+  - **Azure Blobs**: A massively scalable object store for text and binary (unstructured) data.
+    - Serving images or documents directly to a browser.
+    - Storing files for distributed access.
+    - Streaming video and audio.
+    - Storing data for backup and restore, disaster recovery, and archiving.
+    - Storing data for analysis by an on-premises or Azure-hosted service.
+
+  - **Azure Files**: Managed file shares for cloud or on-premises deployments.
+    - Enables you to set up highly available network file shares accessible using SMB.
+    - Can access the files from anywhere in the world using a URL that points to the file and includes a shared access signature (SAS) token.
+    - The storage account credentials are used to provide authentication for access to the file share.
+
+  - **Azure Queues**: A messaging store for reliable messaging between application components.
+    - Queue messages can be up to 64 KB in size, and a queue can contain millions of messages.
+    - Queues are generally used to store lists of messages to be processed asynchronously.
+
+  - **Azure Tables**: A NoSQL store for schemaless storage of structured data.
+    - Azure Cosmos DB Table API offering that provides throughput-optimized tables, global distribution, and automatic secondary indexes.
+
+- **Disk storage** - Azure Storage also includes managed and unmanaged disk capabilities used by virtual machines.
+
+- Each service is accessed through a storage account
+
+#### Types of Storage Accounts
+
+- General-purpose
+  - Standard - use magnetic media to store data
+  - Premium - use SSD to store data; high-performance storage for page blobs, which are primarily used for VHD files
+- Blob
+  - specialized storage account used to store block blobs and append blobs
+  - can't store page blobs in these accounts, therefore can't store VHD files
+  - allow you to set an access tier to Hot (frequently accessed) or Cool; the tier can be changed at any time
+
+#### Accessing your blobs, files, and queues
+
+- Each storage account has two authentication keys, either of which can be used for any operation.
+- Keys can be rolled over.
+- Ways to secure access
+  - Using RBAC in Azure AD to control access to keys
+    - only handles the management operations for that storage account like changing the access tier
+    - can't grant access to data objects
+    - can grant access to the storage account keys, which can then be used to read the data objects
+  - Using SAS
+    - a string containing a security token that can be attached to the URI for an asset that allows you to delegate access to specific storage objects and to specify constraints such as permissions and the date/time range of access.
+- Public access to can be provided to a container and its blobs, or a specific blob.
+
+#### Encryption
+
+- Azure Storage Service Encryption (SSE) at rest automatically encrypts your data prior to persisting to storage and decrypts prior to retrieval.
+- Client-side encryption libraries have methods you can call to programmatically encrypt data before sending it across the wire from the client to Azure.
+
+#### Transferring data
+
+- Use the AzCopy command-line utility to copy blob, and file data within your storage account or across storage accounts.
+- Azure Import/Export service can be used to import or export large amounts of blob data to or from your storage account.
+- To import large amounts of blob data to your storage account in a quick, inexpensive, and reliable way, you can also use Azure Data Box Disk.
+
+### Disk Storage
+> https://docs.microsoft.com/en-us/azure/virtual-machines/linux/about-disks-and-vhds
+
+- All Azure VMs have at least two disks – a Linux OS disk and a temporary disk.
+- The operating system disk is created from an image, and both the operating system disk and the image are virtual hard disks (VHDs) stored in an Azure storage account.
+- VMS also can have one or more data disks, that are also stored as VHDs.
+- Types
+  - OS disk
+    - Registered as SATA drive
+    - Labelled as /dev/sda
+    - 2 GB max capacity
+  - Temp disk
+    - /dev/sdb mounted to /mnt
+  - Data disk
+    - Registered as SCSI drive
+    - 4 GB max capacity
+- VHDs used in Azure are .vhd files stored as page blobs.
+  - Before you can delete a source .vhd file, you’ll need to remove the lease by deleting the disk or image created from it.
+  - All VHD files in Azure that you want to use as a source to create disks or images are read-only, except the .vhd files uploaded or copied to Azure storage by the user.
+  - When you create a disk or image, Azure makes copies of the source .vhd files.
+- Azure Disks are designed for 99.999% availability.
+- 3 performance tiers for storage
+  - Standard HDD
+  - Standard SSD - only available as Managed Disks
+  - Premium SSD
+- Types of Disks
+  - Managed
+    - Ensures that you do not have to worry about the scalability limits of the storage account.
+    - Can also manage your custom images in one storage account per Azure region, and use them to create hundreds of VMs in the same subscription.
+  - Unmanaged
+    - You have to figure out how to maximize the use of one or more storage accounts to get the best performance out of your VMs.
+
+### Storage Replication
+> https://docs.microsoft.com/en-us/azure/storage/common/storage-redundancy
+
+- Options
+  - Locally redundant storage (LRS)
+  - Zone-redundant storage (ZRS)
+  - Geo-redundant storage (GRS)
+  - Read-access geo-redundant storage (RA-GRS)
+
+### Scalability and Performance targets
+> https://docs.microsoft.com/en-us/azure/storage/common/storage-scalability-targets
+
+- When an application reaches the limit of what a partition can handle for the workload, Azure Storage begins to return error code 503 (Server Busy) or error code 500 (Operation Timeout) responses.
+  - Application should use an exponential backoff policy for retries.
+  - If the application exceeds the scalability targets of a single storage account, you can build your application to use multiple storage accounts.
+- Check the [link](https://docs.microsoft.com/en-us/azure/storage/common/storage-scalability-targets) for information on targets.
+
+### Using shared access signatures (SAS)
+> https://docs.microsoft.com/en-us/azure/storage/common/storage-dotnet-shared-access-signature-part-1
+
+- Allows to grant clients access to resources in your storage account, without sharing your account keys.
+- Types of control
+  - interval over which the SAS is valid
+  - permissions granted by the SAS
+  - optional IP address or range of IP addresses from which Azure Storage will accept the SAS
+  - protocol over which Azure Storage will accept the SAS
+
+???
+
+> Note: Refer to this link to understand the [CAP theorem](https://dzone.com/articles/better-explaining-cap-theorem).
