@@ -44,6 +44,7 @@ The vhd listed in the above 2 steps should be the same.
   7. Test the mount, `df -h -x tmpfs -x devtmpfs`.
 
 ```bash
+n0s0098@ubuntu-vm-1:~$ sudo su -
 root@ubuntu-vm-1:~# parted -l
 Model: Msft Virtual Disk (scsi)
 Disk /dev/sda: 32.2GB
@@ -66,8 +67,8 @@ Number  Start   End     Size    Type     File system  Flags
 
 
 Error: /dev/sdc: unrecognised disk label
-Model: Msft Virtual Disk (scsi)
-Disk /dev/sdc: 2199GB
+Model: Msft Virtual Disk (scsi)                                           
+Disk /dev/sdc: 2147MB
 Sector size (logical/physical): 512B/4096B
 Partition Table: unknown
 Disk Flags:
@@ -76,14 +77,14 @@ root@ubuntu-vm-1:~# lsblk
 NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
 sdb      8:16   0    4G  0 disk
 └─sdb1   8:17   0    4G  0 part /mnt
-sr0     11:0    1  628K  0 rom
-sdc      8:32   0    2T  0 disk
+sr0     11:0    1  628K  0 rom  
+sdc      8:32   0    2G  0 disk
 sda      8:0    0   30G  0 disk
 └─sda1   8:1    0   30G  0 part /
 root@ubuntu-vm-1:~# parted /dev/sdc mklabel gpt
 Information: You may need to update /etc/fstab.
 
-root@ubuntu-vm-1:~#   parted -l
+root@ubuntu-vm-1:~#  parted -l
 Model: Msft Virtual Disk (scsi)
 Disk /dev/sda: 32.2GB
 Sector size (logical/physical): 512B/4096B
@@ -105,34 +106,35 @@ Number  Start   End     Size    Type     File system  Flags
 
 
 Model: Msft Virtual Disk (scsi)
-Disk /dev/sdc: 2199GB
+Disk /dev/sdc: 2147MB
 Sector size (logical/physical): 512B/4096B
 Partition Table: gpt
 Disk Flags:
 
 Number  Start  End  Size  File system  Name  Flags
 
-root@ubuntu-vm-1:~#   lsblk -l
-NAME MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
-sdb    8:16   0    4G  0 disk
-sdb1   8:17   0    4G  0 part /mnt
-sr0   11:0    1  628K  0 rom
-sdc    8:32   0    2T  0 disk
-sda    8:0    0   30G  0 disk
-sda1   8:1    0   30G  0 part /
+
+root@ubuntu-vm-1:~#  lsblk
+NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sdb      8:16   0    4G  0 disk
+└─sdb1   8:17   0    4G  0 part /mnt
+sr0     11:0    1  628K  0 rom  
+sdc      8:32   0    2G  0 disk
+sda      8:0    0   30G  0 disk
+└─sda1   8:1    0   30G  0 part /
 root@ubuntu-vm-1:~# parted -a opt /dev/sdc mkpart primary ext4 0% 100%
 Information: You may need to update /etc/fstab.
 
-root@ubuntu-vm-1:~# lsblk -fs
+root@ubuntu-vm-1:~# lsblk -fs                                             
 NAME  FSTYPE LABEL           UUID                                 MOUNTPOINT
-sdb1  ext4                   ad62f57a-5b23-489b-a290-cd51eba47d44 /mnt
-└─sdb
-sr0
-sdc1
-└─sdc
+sdb1  ext4                   b63d35e1-d701-4c74-937f-a09167d5714e /mnt
+└─sdb                                                             
+sr0                                                               
+sdc1                                                              
+└─sdc                                                             
 sda1  ext4   cloudimg-rootfs cdf895f5-190c-422a-b9a5-e8ba4cfad807 /
-└─sda
-root@ubuntu-vm-1:~#   parted -l
+└─sda                                                             
+root@ubuntu-vm-1:~#  parted -l
 Model: Msft Virtual Disk (scsi)
 Disk /dev/sda: 32.2GB
 Sector size (logical/physical): 512B/4096B
@@ -154,55 +156,93 @@ Number  Start   End     Size    Type     File system  Flags
 
 
 Model: Msft Virtual Disk (scsi)
-Disk /dev/sdc: 2199GB
+Disk /dev/sdc: 2147MB
 Sector size (logical/physical): 512B/4096B
 Partition Table: gpt
 Disk Flags:
 
 Number  Start   End     Size    File system  Name     Flags
- 1      1049kB  2199GB  2199GB               primary
+ 1      1049kB  2146MB  2145MB               primary
 
 
-root@ubuntu-vm-1:~#   lsblk
+root@ubuntu-vm-1:~#  lsblk
 NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
 sdb      8:16   0    4G  0 disk
 └─sdb1   8:17   0    4G  0 part /mnt
-sr0     11:0    1  628K  0 rom
-sdc      8:32   0    2T  0 disk
-└─sdc1   8:33   0    2T  0 part
+sr0     11:0    1  628K  0 rom  
+sdc      8:32   0    2G  0 disk
+└─sdc1   8:33   0    2G  0 part
 sda      8:0    0   30G  0 disk
 └─sda1   8:1    0   30G  0 part /
 root@ubuntu-vm-1:~# mkfs.ext4 -L datapartition /dev/sdc1
 mke2fs 1.42.13 (17-May-2015)
-Discarding device blocks: done
-Creating filesystem with 536870400 4k blocks and 134217728 inodes
-Filesystem UUID: b7eeab9f-3052-44a4-946d-d3b4834ba0b7
+Discarding device blocks: done                            
+Creating filesystem with 523776 4k blocks and 131072 inodes
+Filesystem UUID: 8ff7f540-26a5-4204-9ccc-d4388b86fda5
 Superblock backups stored on blocks:
-	32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208,
-	4096000, 7962624, 11239424, 20480000, 23887872, 71663616, 78675968,
-	102400000, 214990848, 512000000
+	32768, 98304, 163840, 229376, 294912
 
-Allocating group tables: done
-Writing inode tables: done
-Creating journal (32768 blocks): done
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (8192 blocks): done
 Writing superblocks and filesystem accounting information: done
 
-root@ubuntu-vm-1:~# lsblk --fs
-NAME   FSTYPE LABEL           UUID                                 MOUNTPOINT
-sdb
-└─sdb1 ext4                   ad62f57a-5b23-489b-a290-cd51eba47d44 /mnt
-sr0
-sdc
-└─sdc1 ext4   datapartition   b7eeab9f-3052-44a4-946d-d3b4834ba0b7
-sda
-└─sda1 ext4   cloudimg-rootfs cdf895f5-190c-422a-b9a5-e8ba4cfad807 /
-root@ubuntu-vm-1:~#   cat /etc/fstab
+root@ubuntu-vm-1:~#  lsblk -fs
+NAME  FSTYPE LABEL           UUID                                 MOUNTPOINT
+sdb1  ext4                   b63d35e1-d701-4c74-937f-a09167d5714e /mnt
+└─sdb                                                             
+sr0                                                               
+sdc1  ext4   datapartition   8ff7f540-26a5-4204-9ccc-d4388b86fda5
+└─sdc                                                             
+sda1  ext4   cloudimg-rootfs cdf895f5-190c-422a-b9a5-e8ba4cfad807 /
+└─sda                                                             
+root@ubuntu-vm-1:~#  parted -l
+Model: Msft Virtual Disk (scsi)
+Disk /dev/sda: 32.2GB
+Sector size (logical/physical): 512B/4096B
+Partition Table: msdos
+Disk Flags:
+
+Number  Start   End     Size    Type     File system  Flags
+ 1      1049kB  32.2GB  32.2GB  primary  ext4         boot
+
+
+Model: Msft Virtual Disk (scsi)
+Disk /dev/sdb: 4295MB
+Sector size (logical/physical): 512B/4096B
+Partition Table: msdos
+Disk Flags:
+
+Number  Start   End     Size    Type     File system  Flags
+ 1      65.5kB  4294MB  4294MB  primary  ext4
+
+
+Model: Msft Virtual Disk (scsi)
+Disk /dev/sdc: 2147MB
+Sector size (logical/physical): 512B/4096B
+Partition Table: gpt
+Disk Flags:
+
+Number  Start   End     Size    File system  Name     Flags
+ 1      1049kB  2146MB  2145MB  ext4         primary
+
+
+root@ubuntu-vm-1:~#  lsblk
+NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sdb      8:16   0    4G  0 disk
+└─sdb1   8:17   0    4G  0 part /mnt
+sr0     11:0    1  628K  0 rom  
+sdc      8:32   0    2G  0 disk
+└─sdc1   8:33   0    2G  0 part
+sda      8:0    0   30G  0 disk
+└─sda1   8:1    0   30G  0 part /
+root@ubuntu-vm-1:~# cat /etc/fstab
 # CLOUD_IMG: This file was created/modified by the Cloud Image build process
 UUID=cdf895f5-190c-422a-b9a5-e8ba4cfad807	/	 ext4	defaults,discard	0 0
 /dev/disk/cloud/azure_resource-part1	/mnt	auto	defaults,nofail,x-systemd.requires=cloud-init.service,comment=cloudconfig	0	2
 root@ubuntu-vm-1:~# mkdir -p /mnt/data
 root@ubuntu-vm-1:~# mount -o defaults /dev/sdc1 /mnt/data
-root@ubuntu-vm-1:~#   parted -l
+root@ubuntu-vm-1:~#  parted -l
 Model: Msft Virtual Disk (scsi)
 Disk /dev/sda: 32.2GB
 Sector size (logical/physical): 512B/4096B
@@ -224,69 +264,92 @@ Number  Start   End     Size    Type     File system  Flags
 
 
 Model: Msft Virtual Disk (scsi)
-Disk /dev/sdc: 2199GB
+Disk /dev/sdc: 2147MB
 Sector size (logical/physical): 512B/4096B
 Partition Table: gpt
 Disk Flags:
 
 Number  Start   End     Size    File system  Name     Flags
- 1      1049kB  2199GB  2199GB  ext4         primary
+ 1      1049kB  2146MB  2145MB  ext4         primary
 
 
-root@ubuntu-vm-1:~#   lsblk -l
-NAME MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
-sdb    8:16   0    4G  0 disk
-sdb1   8:17   0    4G  0 part /mnt
-sr0   11:0    1  628K  0 rom
-sdc    8:32   0    2T  0 disk
-sdc1   8:33   0    2T  0 part /mnt/data
-sda    8:0    0   30G  0 disk
-sda1   8:1    0   30G  0 part /
+root@ubuntu-vm-1:~#  lsblk
+NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sdb      8:16   0    4G  0 disk
+└─sdb1   8:17   0    4G  0 part /mnt
+sr0     11:0    1  628K  0 rom  
+sdc      8:32   0    2G  0 disk
+└─sdc1   8:33   0    2G  0 part /mnt/data
+sda      8:0    0   30G  0 disk
+└─sda1   8:1    0   30G  0 part /
 root@ubuntu-vm-1:~# df -h -x tmpfs -x devtmpfs
 Filesystem      Size  Used Avail Use% Mounted on
 /dev/sda1        30G  1.4G   28G   5% /
 /dev/sdb1       3.9G  8.0M  3.7G   1% /mnt
-/dev/sdc1       2.0T   71M  1.9T   1% /mnt/data
+/dev/sdc1       2.0G  3.0M  1.9G   1% /mnt/data
+```
+
+- Step 4
+
+```bash
+cd / && echo 'Hello World from disk sda/sda1 30G mount /' > mydata-pri.dat
+cd /mnt && echo 'Hello World from disk sdb/sdb1 4G mount /mnt' > mydata-temp.dat
+cd /mnt/data && echo 'Hello World from disk sdc/sdc1 2G mount /mnt/data' > mydata-data.dat
 ```
 
 - Step 6
 
 ```bash
+root@ubuntu-vm-2-fromimage:~# lsblk
+NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sdb      8:16   0    4G  0 disk
+└─sdb1   8:17   0    4G  0 part /mnt
+sr0     11:0    1  628K  0 rom  
+sdc      8:32   0    2G  0 disk
+└─sdc1   8:33   0    2G  0 part
+sda      8:0    0   30G  0 disk
+└─sda1   8:1    0   30G  0 part /
 root@ubuntu-vm-2-fromimage:~# lsblk -fs
 NAME  FSTYPE LABEL           UUID                                 MOUNTPOINT
-sdb1  ext4                   7085a2ff-d484-435a-a325-5f3f07a2db6c /mnt
-└─sdb
-sr0
-sdc1  ext4   datapartition   b7eeab9f-3052-44a4-946d-d3b4834ba0b7
-└─sdc
+sdb1  ext4                   3f212b30-695d-4146-8535-6781768f99cd /mnt
+└─sdb                                                             
+sr0                                                               
+sdc1  ext4   datapartition   8ff7f540-26a5-4204-9ccc-d4388b86fda5
+└─sdc                                                             
 sda1  ext4   cloudimg-rootfs cdf895f5-190c-422a-b9a5-e8ba4cfad807 /
-└─sda
-root@ubuntu-vm-2-fromimage:~# ll /mnt
-total 28
-drwxr-xr-x  3 root root  4096 Aug  4 06:46 ./
-drwxr-xr-x 23 root root  4096 Aug  4 06:46 ../
--r--r--r--  1 root root   639 Aug  4 06:46 DATALOSS_WARNING_README.txt
-drwx------  2 root root 16384 Aug  4 06:46 lost+found/
+└─sda                                                             
+root@ubuntu-vm-2-fromimage:~# cat /mydata-pri.dat
+Hello World from disk sda/sda1 30G mount /
+root@ubuntu-vm-2-fromimage:~# ls /mnt/
+DATALOSS_WARNING_README.txt  lost+found
 root@ubuntu-vm-2-fromimage:~# mkdir -p /mnt/data
 root@ubuntu-vm-2-fromimage:~# mount -o defaults /dev/sdc1 /mnt/data
-root@ubuntu-vm-2-fromimage:~# lsblk -fs
-NAME  FSTYPE LABEL           UUID                                 MOUNTPOINT
-sdb1  ext4                   7085a2ff-d484-435a-a325-5f3f07a2db6c /mnt
-└─sdb
-sr0
-sdc1  ext4   datapartition   b7eeab9f-3052-44a4-946d-d3b4834ba0b7 /mnt/data
-└─sdc
-sda1  ext4   cloudimg-rootfs cdf895f5-190c-422a-b9a5-e8ba4cfad807 /
-└─sda
-root@ubuntu-vm-2-fromimage:~# ll /mnt/data/
-total 28
-drwxr-xr-x 3 root root  4096 Aug  4 06:32 ./
-drwxr-xr-x 4 root root  4096 Aug  4 06:53 ../
-drwx------ 2 root root 16384 Aug  4 06:11 lost+found/
--rw-r--r-- 1 root root    30 Aug  4 06:32 testDataDiskFile1
-root@ubuntu-vm-2-fromimage:~# cat /mnt/data/testDataDiskFile1
-In data disk partition file 1
+root@ubuntu-vm-2-fromimage:~# lsblk
+NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sdb      8:16   0    4G  0 disk
+└─sdb1   8:17   0    4G  0 part /mnt
+sr0     11:0    1  628K  0 rom  
+sdc      8:32   0    2G  0 disk
+└─sdc1   8:33   0    2G  0 part /mnt/data
+sda      8:0    0   30G  0 disk
+└─sda1   8:1    0   30G  0 part /
+root@ubuntu-vm-2-fromimage:~# ls /mnt/data/
+lost+found  mydata-data.dat
+root@ubuntu-vm-2-fromimage:~# cat /mnt/data/mydata-data.dat
+Hello World from disk sdc/sdc1 2G mount /mnt/data
 ```
+
+- Step 7
+
+  - Go to Virtual machines > [Your VM] > Disks, click on Edit and Detach the Data disk.
+  - Go to Disks > [the detached 2GB data disk] and resize.
+  - Go to Virtual machines > [Your VM] > Disks and add the resized disk.
+
+**Before resize**
+![](/Azure/images/storage-ex2-before.png)
+
+**After resize**
+![](/Azure/images/storage-ex2-resize.png)
 
 - Step 8
 
@@ -295,41 +358,74 @@ root@ubuntu-vm-2-fromimage:~# lsblk # after detaching
 NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
 sdb      8:16   0    4G  0 disk
 └─sdb1   8:17   0    4G  0 part /mnt
-sr0     11:0    1  628K  0 rom
+sr0     11:0    1  628K  0 rom  
 sda      8:0    0   30G  0 disk
 └─sda1   8:1    0   30G  0 part /
 root@ubuntu-vm-2-fromimage:~# lsblk # after re-attaching
 NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
-sdd      8:48   0    4T  0 disk
-└─sdd1   8:49   0    2T  0 part
+sdd      8:48   0    4G  0 disk
+└─sdd1   8:49   0    2G  0 part
 sdb      8:16   0    4G  0 disk
 └─sdb1   8:17   0    4G  0 part /mnt
-sr0     11:0    1  628K  0 rom
+sr0     11:0    1  628K  0 rom  
 sda      8:0    0   30G  0 disk
 └─sda1   8:1    0   30G  0 part /
 root@ubuntu-vm-2-fromimage:~# lsblk -fs
 NAME  FSTYPE LABEL           UUID                                 MOUNTPOINT
-sdd1  ext4   datapartition   b7eeab9f-3052-44a4-946d-d3b4834ba0b7
-└─sdd
-sdb1  ext4                   7085a2ff-d484-435a-a325-5f3f07a2db6c /mnt
-└─sdb
-sr0
+sdd1  ext4   datapartition   8ff7f540-26a5-4204-9ccc-d4388b86fda5
+└─sdd                                                             
+sdb1  ext4                   3f212b30-695d-4146-8535-6781768f99cd /mnt
+└─sdb                                                             
+sr0                                                               
 sda1  ext4   cloudimg-rootfs cdf895f5-190c-422a-b9a5-e8ba4cfad807 /
-└─sda
+└─sda                                                             
+root@ubuntu-vm-2-fromimage:~#  ls /mnt/data/
+ls: reading directory '/mnt/data/': Input/output error
+root@ubuntu-vm-2-fromimage:~# parted -l
+Model: Msft Virtual Disk (scsi)
+Disk /dev/sda: 32.2GB
+Sector size (logical/physical): 512B/4096B
+Partition Table: msdos
+Disk Flags:
+
+Number  Start   End     Size    Type     File system  Flags
+ 1      1049kB  32.2GB  32.2GB  primary  ext4         boot
+
+
+Model: Msft Virtual Disk (scsi)
+Disk /dev/sdb: 4295MB
+Sector size (logical/physical): 512B/4096B
+Partition Table: msdos
+Disk Flags:
+
+Number  Start   End     Size    Type     File system  Flags
+ 1      65.5kB  4294MB  4294MB  primary  ext4
+
+
+Warning: Not all of the space available to /dev/sdd appears to be used, you can
+fix the GPT to use all of the space (an extra 4194304 blocks) or continue with
+the current setting?
+Fix/Ignore? I                                                             
+Model: Msft Virtual Disk (scsi)
+Disk /dev/sdd: 4295MB
+Sector size (logical/physical): 512B/4096B
+Partition Table: gpt
+Disk Flags:
+
+Number  Start   End     Size    File system  Name     Flags
+ 1      1049kB  2146MB  2145MB  ext4         primary
+
+
 root@ubuntu-vm-2-fromimage:~# mount -o defaults /dev/sdd1 /mnt/data
-root@ubuntu-vm-2-fromimage:~#   ll /mnt/data
-total 28
-drwxr-xr-x 3 root root  4096 Aug  4 06:32 ./
-drwxr-xr-x 4 root root  4096 Aug  4 06:53 ../
-drwx------ 2 root root 16384 Aug  4 06:11 lost+found/
--rw-r--r-- 1 root root    30 Aug  4 06:32 testDataDiskFile1
-root@ubuntu-vm-2-fromimage:~#   cat /mnt/data/testDataDiskFile1
-In data disk partition file 1
+root@ubuntu-vm-2-fromimage:~# ls /mnt/data/
+lost+found  mydata-data.dat
+root@ubuntu-vm-2-fromimage:~# cat /mnt/data/mydata-data.dat
+Hello World from disk sdc/sdc1 2G mount /mnt/data
 ```
 
 - Step 9
 
-![](/Azure/images/storage-ex2.png)
+![](/Azure/images/storage-ex2-downsize.png)
 
 ## Exercise 3
 
