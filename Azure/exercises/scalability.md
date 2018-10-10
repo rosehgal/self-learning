@@ -90,7 +90,10 @@ az vmss create -g scaleex3 -n vmss1si --image UbuntuLTS -l southindia --vm-sku S
 - Step 3
 
 ```bash
-$ az vmss scale -g scaleex3 -n vmss1si --new-capacity 3
+az vmss scale -g scaleex3 -n vmss1si --new-capacity 3
+```
+
+```json
 {
   "id": "/subscriptions/0bb3891d-28db-464e-8daf-cb07d9d312d2/resourceGroups/scaleex3/providers/Microsoft.Compute/virtualMachineScaleSets/vmss1si",
   "identity": null,
@@ -208,7 +211,11 @@ $ az vmss scale -g scaleex3 -n vmss1si --new-capacity 3
   "zoneBalance": null,
   "zones": null
 }
-$ az vmss scale -g scaleex3 -n vmss1si --new-capacity 2
+```
+```bash
+az vmss scale -g scaleex3 -n vmss1si --new-capacity 2
+```
+```json
 {
   "id": "/subscriptions/0bb3891d-28db-464e-8daf-cb07d9d312d2/resourceGroups/scaleex3/providers/Microsoft.Compute/virtualMachineScaleSets/vmss1si",
   "identity": null,
@@ -331,7 +338,8 @@ $ az vmss scale -g scaleex3 -n vmss1si --new-capacity 2
 - Step 4 and 5
 > https://docs.microsoft.com/en-us/azure/virtual-machine-scale-sets/tutorial-autoscale-cli
 
-  - To check the CPU utilization metric, run `az monitor metrics list --resource /subscriptions/fda10a14-c1d3-4e91-9b04-b097c287cb38/resourceGroups/ABC/providers/Microsoft.Compute/virtualMachineScaleSets/<vmss_name> --metric "Percentage CPU" --interval PT30M`
+  - To check the CPU utilization metric, run  
+  `az monitor metrics list --resource /subscriptions/fda10a14-c1d3-4e91-9b04-b097c287cb38/resourceGroups/ABC/providers/Microsoft.Compute/virtualMachineScaleSets/<vmss_name> --metric "Percentage CPU" --interval PT30M`
 
   - Script to auto scale
 
